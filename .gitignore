@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.env
+# Virtual environments
+.venv
+# Keep track of sent emails
+sent_summaries.json
+
+# Temporary clone directory
+tmp_repos/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc

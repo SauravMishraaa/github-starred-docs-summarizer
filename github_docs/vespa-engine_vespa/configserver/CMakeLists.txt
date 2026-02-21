@@ -1,0 +1,24 @@
+# Copyright Vespa.ai. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root.
+install_configserver_component(configserver)
+
+vespa_install_script(src/main/sh/vespa-configserver-remove-state bin)
+vespa_install_script(src/main/sh/start-configserver libexec/vespa)
+vespa_install_script(src/main/sh/start-logd libexec/vespa)
+vespa_install_script(src/main/sh/stop-configserver libexec/vespa)
+
+install(DIRECTORY src/main/resources/logd DESTINATION conf)
+install(DIRECTORY src/main/resources/configserver-app DESTINATION conf)
+install(DIRECTORY src/main/resources/inheritable-apps DESTINATION conf)
+install(DIRECTORY DESTINATION conf/configserver)
+
+install(DIRECTORY DESTINATION conf/configserver-app/components)
+install(DIRECTORY DESTINATION conf/configserver-app/config-models)
+install_symlink(lib/jars/config-model-fat.jar conf/configserver-app/components/config-model-fat.jar)
+install_symlink(lib/jars/configserver-flags-jar-with-dependencies.jar conf/configserver-app/components/configserver-flags.jar)
+install_symlink(lib/jars/flags-jar-with-dependencies.jar conf/configserver-app/components/flags.jar)
+install_symlink(lib/jars/http-client-jar-with-dependencies.jar conf/configserver-app/components/http-client.jar)
+install_symlink(lib/jars/zookeeper-server-jar-with-dependencies.jar conf/configserver-app/components/zookeeper-server.jar)
+install_symlink(conf/configserver-app/components lib/jars/config-models)
+install(DIRECTORY DESTINATION var/zookeeper)
+install(DIRECTORY DESTINATION var/zookeeper/conf)
+install(DIRECTORY DESTINATION logs/vespa/configserver)

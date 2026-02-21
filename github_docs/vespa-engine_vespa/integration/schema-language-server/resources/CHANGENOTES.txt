@@ -1,0 +1,2 @@
+- Support for multiple inheritance of match-features.
+- Fixed formatting bugs.

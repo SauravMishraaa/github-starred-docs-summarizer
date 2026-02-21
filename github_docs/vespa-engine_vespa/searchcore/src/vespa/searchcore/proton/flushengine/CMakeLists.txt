@@ -1,0 +1,29 @@
+# Copyright Vespa.ai. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root.
+vespa_add_library(searchcore_flushengine STATIC
+    SOURCES
+    active_flush_stats.cpp
+    cachedflushtarget.cpp
+    set_strategy_result.cpp
+    shrink_lid_space_flush_target.cpp
+    flush_all_strategy.cpp
+    flushcontext.cpp
+    flushengine.cpp
+    flush_engine_explorer.cpp
+    flush_history.cpp
+    flush_history_entry.cpp
+    flush_history_explorer.cpp
+    flush_history_view.cpp
+    flush_strategy_history_entry.cpp
+    flush_strategy_id_listener.cpp
+    flush_strategy_id_notifier.cpp
+    flush_target_candidate.cpp
+    flush_target_candidates.cpp
+    flushtargetproxy.cpp
+    flushtask.cpp
+    prepare_restart_flush_strategy.cpp
+    threadedflushtarget.cpp
+    tls_stats_factory.cpp
+    tls_stats_map.cpp
+    DEPENDS
+    searchcorespi
+)

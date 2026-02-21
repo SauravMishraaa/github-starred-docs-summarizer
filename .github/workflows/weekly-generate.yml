@@ -1,0 +1,43 @@
+name: Generate Documentation Summaries
+
+on:
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      
+      - name: Set up Python
+        run: uv python install 3.11
+      
+      - name: Install dependencies
+        run: |
+          uv pip install openai requests python-dotenv
+      
+      - name: Generate summaries
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+        run: |
+          uv run client.py
+      
+      - name: Commit and push new summaries
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add github_docs/*/SUMMARY.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "Add new documentation summaries [skip ci]"
+          git push
+        continue-on-error: true

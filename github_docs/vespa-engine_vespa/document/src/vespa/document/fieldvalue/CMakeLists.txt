@@ -1,0 +1,31 @@
+# Copyright Vespa.ai. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root.
+vespa_add_library(document_fieldvalues OBJECT
+    SOURCES
+    annotationreferencefieldvalue.cpp
+    arrayfieldvalue.cpp
+    boolfieldvalue.cpp
+    bytefieldvalue.cpp
+    collectionfieldvalue.cpp
+    document.cpp
+    doublefieldvalue.cpp
+    fieldvalue.cpp
+    floatfieldvalue.cpp
+    intfieldvalue.cpp
+    iteratorhandler.cpp
+    literalfieldvalue.cpp
+    longfieldvalue.cpp
+    mapfieldvalue.cpp
+    numericfieldvalue.cpp
+    predicatefieldvalue.cpp
+    rawfieldvalue.cpp
+    serializablearray.cpp
+    shortfieldvalue.cpp
+    stringfieldvalue.cpp
+    structfieldvalue.cpp
+    structuredfieldvalue.cpp
+    tensorfieldvalue.cpp
+    variablemap.cpp
+    weightedsetfieldvalue.cpp
+    referencefieldvalue.cpp
+    DEPENDS
+)

@@ -1,0 +1,32 @@
+# Copyright Vespa.ai. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root.
+vespa_add_library(documentapi_documentapimessages OBJECT
+    SOURCES
+    documentignoredreply.cpp
+    documentmessage.cpp
+    documentreply.cpp
+    documentstate.cpp
+    emptybucketsmessage.cpp
+    feedanswer.cpp
+    feedmessage.cpp
+    feedreply.cpp
+    getbucketlistmessage.cpp
+    getbucketlistreply.cpp
+    getbucketstatemessage.cpp
+    getbucketstatereply.cpp
+    getdocumentmessage.cpp
+    getdocumentreply.cpp
+    putdocumentmessage.cpp
+    queryresultmessage.cpp
+    removedocumentmessage.cpp
+    removedocumentreply.cpp
+    removelocationmessage.cpp
+    statbucketmessage.cpp
+    statbucketreply.cpp
+    testandsetcondition.cpp
+    testandsetmessage.cpp
+    updatedocumentmessage.cpp
+    updatedocumentreply.cpp
+    visitor.cpp
+    wrongdistributionreply.cpp
+    DEPENDS
+)
