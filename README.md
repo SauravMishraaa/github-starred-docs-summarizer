@@ -349,12 +349,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 🙏 Acknowledgements
-
-- [OpenAI](https://openai.com) for the GPT-4o-mini model
-- [GitHub Actions](https://github.com/features/actions) for automation
-- [uv](https://github.com/astral-sh/uv) for fast Python package management
-
----
-
 <p align="center">Made with ❤️ | Give it a ⭐ if you find it useful!</p>
