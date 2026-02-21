@@ -77,7 +77,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ### Step 3: Install Dependencies
 
 ```bash
-uv pip install openai requests python-dotenv
+uv add openai requests python-dotenv
 ```
 
 ### Step 4: Set Up Environment Variables
