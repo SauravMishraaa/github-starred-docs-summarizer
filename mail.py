@@ -99,7 +99,6 @@ def enhance_markdown_content(content: str) -> str:
 def create_html_email(summary_content: str, repo_name: str) -> str:
     """Create an attractive HTML email with improved styling."""
     
-    # Enhance the markdown content
     enhanced_content = enhance_markdown_content(summary_content)
     
     # Convert markdown to HTML
@@ -375,7 +374,6 @@ def main():
     # Send email
     subject = f"📚 Daily Documentation Summary: {repo_name}"
     if send_email(subject, html_content):
-        # Update sent log
         sent_log[repo_name] = {
             'hash': content_hash,
             'sent_at': datetime.now().isoformat(),
