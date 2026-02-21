@@ -39,7 +39,11 @@ Track sent summaries (cyclic)
 ```
 
 ---
+## 📹 Quick Demo
 
+![Demo GIF](https://github.com/user-attachments/assets/bbda97b8-9f80-4671-98fd-faf8ed4bcdee)
+
+---
 ## 📋 Prerequisites
 
 - Python 3.11+
