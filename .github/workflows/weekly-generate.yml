@@ -27,7 +27,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          uv pip install openai requests python-dotenv
+          uv pip install openai requests python-dotenv markdown
       
       - name: Generate summaries
         env:
