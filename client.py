@@ -14,7 +14,7 @@ load_dotenv()
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-def read_docs_content(docs_files, max_chars=400000):  # Increased further
+def read_docs_content(docs_files, max_chars=200000):  # Increased further
     """
     Read documentation files and combine their content.
     Limits total content to avoid token limits.
