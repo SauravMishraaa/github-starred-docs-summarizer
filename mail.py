@@ -9,41 +9,115 @@ import markdown
 from dotenv import load_dotenv
 load_dotenv()
 
-def get_latest_summary():
-    """Find and return the most recently modified SUMMARY.md file."""
-    docs_dir = Path("github_docs")
-    if not docs_dir.exists():
-        return None, None
-    
-    summary_files = list(docs_dir.rglob("SUMMARY.md"))
-    if not summary_files:
-        return None, None
-    
-    latest_file = max(summary_files, key=lambda p: p.stat().st_mtime)
-    repo_name = latest_file.parent.name
-    
-    with open(latest_file, 'r', encoding='utf-8') as f:
-        content = f.read()
-    
-    return content, repo_name
+SENT_LOG_FILE = Path("sent_summaries.json")
+QUEUE_FILE = Path("summary_queue.json")
 
 def load_sent_log():
-    """Load the log of sent summaries."""
-    log_file = Path("sent_summaries.json")
-    if log_file.exists():
-        with open(log_file, 'r') as f:
+    if SENT_LOG_FILE.exists():
+        with open(SENT_LOG_FILE, 'r') as f:
             return json.load(f)
     return {}
 
 def save_sent_log(log_data):
-    """Save the log of sent summaries."""
-    with open("sent_summaries.json", 'w') as f:
+    with open(SENT_LOG_FILE, 'w') as f:
         json.dump(log_data, indent=2, fp=f)
 
+def load_queue():
+    if QUEUE_FILE.exists():
+        with open(QUEUE_FILE, 'r') as f:
+            return json.load(f)
+    return {"queue": [], "sent_order": []}
+
+def save_queue(queue_data):
+    with open(QUEUE_FILE, 'w') as f:
+        json.dump(queue_data, indent=2, fp=f)
+
 def get_summary_hash(content):
-    """Create a simple hash of the summary content."""
     import hashlib
     return hashlib.md5(content.encode()).hexdigest()
+
+def get_all_summaries():
+    """Get all SUMMARY.md files with their metadata."""
+    docs_dir = Path("github_docs")
+    if not docs_dir.exists():
+        return {}
+    
+    summaries = {}
+    for summary_file in docs_dir.rglob("SUMMARY.md"):
+        repo_name = summary_file.parent.name
+        with open(summary_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        summaries[repo_name] = {
+            "path": str(summary_file),
+            "hash": get_summary_hash(content),
+            "content": content,
+            "modified_at": summary_file.stat().st_mtime
+        }
+    return summaries
+
+def build_queue():
+    """Build/update the send queue based on available summaries."""
+    all_summaries = get_all_summaries()
+    queue_data = load_queue()
+
+    existing_queue = queue_data.get("queue", [])
+    sent_order = queue_data.get("sent_order", [])
+
+    existing_queue_repos = {item["repo_name"] for item in existing_queue}
+    all_repo_names = set(all_summaries.keys())
+
+    # Detect new repos not in queue or sent_order
+    new_repos = all_repo_names - existing_queue_repos - set(sent_order)
+
+    # Add new repos to front of queue
+    new_entries = [
+        {"repo_name": r, "added_at": datetime.now().isoformat()}
+        for r in sorted(new_repos, key=lambda r: all_summaries[r]["modified_at"], reverse=True)
+    ]
+
+    final_queue = new_entries + existing_queue
+
+    # If queue is empty, start new cycle with all repos
+    if not final_queue:
+        print("Queue empty - starting new cycle with all repos.")
+        sent_order_repos = [r for r in sent_order if r in all_summaries]
+        final_queue = [
+            {"repo_name": r, "added_at": datetime.now().isoformat()}
+            for r in sent_order_repos
+        ]
+        sent_order.clear()
+    
+    queue_data["queue"] = final_queue
+    queue_data["sent_order"] = sent_order
+    save_queue(queue_data)
+
+    print(f"Queue status: {len(final_queue)} repos pending")
+    if new_repos:
+        print(f"New repos: {list(new_repos)}")
+
+    return queue_data
+
+
+def get_next_to_send():
+    """Get the next repo from queue to send."""
+    all_summaries = get_all_summaries()
+    queue_data = build_queue()
+    queue = queue_data.get("queue", [])
+
+    if not queue:
+        print("No summaries to send.")
+        return None, None, queue_data
+
+    next_item = queue[0]
+    repo_name = next_item["repo_name"]
+
+    if repo_name not in all_summaries:
+        print(f"Repo {repo_name} not found, skipping.")
+        queue_data["queue"].pop(0)
+        save_queue(queue_data)
+        return None, None, queue_data
+
+    return all_summaries[repo_name]["content"], repo_name, queue_data
 
 def enhance_markdown_content(content: str) -> str:
     """Enhance markdown content with special formatting."""
@@ -96,7 +170,7 @@ def enhance_markdown_content(content: str) -> str:
     
     return '\n'.join(enhanced_lines)
 
-def create_html_email(summary_content: str, repo_name: str) -> str:
+def create_html_email(summary_content: str, repo_name: str, queue_position: int, queue_total: int) -> str:
     """Create an attractive HTML email with improved styling."""
     
     enhanced_content = enhance_markdown_content(summary_content)
@@ -144,6 +218,14 @@ def create_html_email(summary_content: str, repo_name: str) -> str:
                 margin: 10px 0 0 0;
                 opacity: 0.9;
                 font-size: 14px;
+            }}
+            .progress {{
+                background: rgba(255,255,255,0.2);
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 13px;
+                margin-top: 10px;
+                display: inline-block;
             }}
             .content {{
                 padding: 40px;
@@ -299,6 +381,7 @@ def create_html_email(summary_content: str, repo_name: str) -> str:
             <div class="header">
                 <h1>📚 Daily Documentation Summary</h1>
                 <p>{datetime.now().strftime("%B %d, %Y")}</p>
+                <div class="progress">📬 Repo {queue_position} of {queue_total}</div>
             </div>
             <div class="content">
                 <div class="repo-badge">🔖 Repository: {repo_name}</div>
@@ -350,39 +433,40 @@ def send_email(subject: str, html_content: str):
 
 def main():
     print("Starting daily email summary task...")
-    
-    # Get the latest summary
-    summary_content, repo_name = get_latest_summary()
-    
-    if not summary_content:
-        print("No summary files found")
+
+    summary_content, repo_name, queue_data = get_next_to_send()
+
+    if not summary_content or not repo_name:
+        print("Nothing to send today.")
         return
-    
-    # Check if we've already sent this summary
-    sent_log = load_sent_log()
-    content_hash = get_summary_hash(summary_content)
-    
-    if repo_name in sent_log and sent_log[repo_name].get('hash') == content_hash:
-        print(f"Summary for {repo_name} already sent. Skipping.")
-        return
-    
-    print(f"Found new summary for repository: {repo_name}")
-    
-    # Create HTML email
-    html_content = create_html_email(summary_content, repo_name)
-    
-    # Send email
-    subject = f"📚 Daily Documentation Summary: {repo_name}"
+
+    queue = queue_data.get("queue", [])
+    sent_order = queue_data.get("sent_order", [])
+    total_cycle = len(queue) + len(sent_order)
+    position = len(sent_order) + 1
+
+    print(f"Sending summary for: {repo_name} ({position}/{total_cycle})")
+
+    html_content = create_html_email(summary_content, repo_name, position, total_cycle)
+    subject = f"📚 Doc Summary [{position}/{total_cycle}]: {repo_name}"
+
     if send_email(subject, html_content):
+        # Update queue and sent_order
+        queue_data["queue"] = [i for i in queue if i["repo_name"] != repo_name]
+        queue_data["sent_order"].append(repo_name)
+        save_queue(queue_data)
+        
+        # Log as sent
+        sent_log = load_sent_log()
         sent_log[repo_name] = {
-            'hash': content_hash,
-            'sent_at': datetime.now().isoformat(),
-            'date': datetime.now().strftime("%Y-%m-%d")
+            "hash": get_summary_hash(summary_content),
+            "sent_at": datetime.now().isoformat(),
         }
         save_sent_log(sent_log)
-        print("Sent log updated")
+
+        print(f"Sent and logged: {repo_name}")
     else:
-        print("Failed to send email")
+        print(f"Failed to send: {repo_name}")
 
 if __name__ == "__main__":
     main()
