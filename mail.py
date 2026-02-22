@@ -381,7 +381,6 @@ def create_html_email(summary_content: str, repo_name: str, queue_position: int,
             <div class="header">
                 <h1>📚 Daily Documentation Summary</h1>
                 <p>{datetime.now().strftime("%B %d, %Y")}</p>
-                <div class="progress">📬 Repo {queue_position} of {queue_total}</div>
             </div>
             <div class="content">
                 <div class="repo-badge">🔖 Repository: {repo_name}</div>
@@ -440,18 +439,14 @@ def main():
         print("Nothing to send today.")
         return
 
-    queue = queue_data.get("queue", [])
-    sent_order = queue_data.get("sent_order", [])
-    total_cycle = len(queue) + len(sent_order)
-    position = len(sent_order) + 1
+    print(f"Sending summary for: {repo_name}")
 
-    print(f"Sending summary for: {repo_name} ({position}/{total_cycle})")
-
-    html_content = create_html_email(summary_content, repo_name, position, total_cycle)
-    subject = f"📚 Doc Summary [{position}/{total_cycle}]: {repo_name}"
+    html_content = create_html_email(summary_content, repo_name, 0, 0)
+    subject = f"📚 Doc Summary: {repo_name}"
 
     if send_email(subject, html_content):
         # Update queue and sent_order
+        queue = queue_data.get("queue", [])
         queue_data["queue"] = [i for i in queue if i["repo_name"] != repo_name]
         queue_data["sent_order"].append(repo_name)
         save_queue(queue_data)

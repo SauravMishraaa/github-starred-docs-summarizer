@@ -18,7 +18,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:
-          enable-cache: true
+          enable-cache: false
       
       - name: Set up Python
         run: uv python install 3.11
@@ -36,6 +36,15 @@ jobs:
           name: email-queue-log
           path: .
         continue-on-error: true
+      
+      - name: Create default queue files if missing
+        run: |
+          if [ ! -f sent_summaries.json ]; then
+            echo '{}' > sent_summaries.json
+          fi
+          if [ ! -f summary_queue.json ]; then
+            echo '{"queue": [], "sent_order": []}' > summary_queue.json
+          fi
       
       - name: Send daily summary email
         env:
