@@ -59,7 +59,6 @@ https://github.com/user-attachments/assets/bbda97b8-9f80-4671-98fd-faf8ed4bcdee
 ### Step 1: Fork & Clone the Repository
 
 ```bash
-# Fork this repository on GitHub first, then:
 git clone https://github.com/YOUR-USERNAME/github-docs-summarizer.git
 cd github-docs-summarizer
 ```
@@ -163,13 +162,10 @@ Add these secrets (paste values without quotes):
 ### Step 6: Test Locally
 
 ```bash
-# Test email setup
 uv run test_mail.py
 
-# Generate summaries for your starred repos
 uv run client.py
 
-# Send one summary email
 uv run mail.py
 ```
 
@@ -192,7 +188,7 @@ Edit `.github/workflows/daily-email.yml`:
 ```yaml
 on:
   schedule:
-    - cron: '0 9 * * *'  # Every day at 9 AM UTC
+    - cron: '0 9 * * *'
 ```
 
 Use [crontab.guru](https://crontab.guru) to customize the schedule.
@@ -210,19 +206,12 @@ Edit `.github/workflows/weekly-generate.yml`:
 ```yaml
 on:
   schedule:
-    - cron: '0 2 * * 0'  # Every Sunday at 2 AM UTC
+    - cron: '0 2 * * 0'
 ```
 
 ### Manually Trigger Workflows
 
 Go to **Actions** tab → Select workflow → Click **Run workflow**
-
-Or use the trigger script:
-
-```bash
-# Edit trigger_workflow.py with your repo name first
-uv run trigger_workflow.py
-```
 
 ---
 
@@ -245,7 +234,6 @@ github-docs-summarizer/
 ├── fetch.py                        # Fetches starred repos from GitHub
 ├── mail.py                         # Sends daily email
 ├── test_mail.py                    # Tests email configuration
-├── trigger_workflow.py             # Manually triggers workflows
 ├── .env.example                    # Example environment variables
 ├── .gitignore
 └── README.md
@@ -262,7 +250,6 @@ github-docs-summarizer/
 | `client.py` | Reads docs, generates AI summaries using OpenAI |
 | `mail.py` | Sends daily summaries via email in cyclic order |
 | `test_mail.py` | Tests email configuration before running |
-| `trigger_workflow.py` | Triggers GitHub Actions workflows via API |
 
 ---
 
