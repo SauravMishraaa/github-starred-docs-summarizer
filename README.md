@@ -163,9 +163,7 @@ Add these secrets (paste values without quotes):
 
 ```bash
 uv run test_mail.py
-
 uv run client.py
-
 uv run mail.py
 ```
 
