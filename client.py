@@ -250,14 +250,15 @@ def process_repo_with_summary(repo_url):
 
     if not docs_files:
         logging.warning(f"No documentation found for {repo_name}")
-    else:
-        logging.info(f"Found {len(docs_files)} documentation files")
-        copy_docs(docs_files, full_repo_name, DOCS_DIR, clone_path)
+        return True
         
-        docs_content = read_docs_content(docs_files)
-        summary = summarize_docs(docs_content, full_repo_name)
-        if summary:
-            save_summary(summary, full_repo_name, DOCS_DIR)
+    logging.info(f"Found {len(docs_files)} documentation files")
+    copy_docs(docs_files, full_repo_name, DOCS_DIR, clone_path)
+        
+    docs_content = read_docs_content(docs_files)
+    summary = summarize_docs(docs_content, full_repo_name)
+    if summary:
+        save_summary(summary, full_repo_name, DOCS_DIR)
     
     try:
         shutil.rmtree(clone_path, onerror=handle_remove_readonly)
@@ -283,9 +284,14 @@ def fetch_all_starred_docs_with_summary():
             success_count += 1
         
         if i < len(starred_repos):
-            wait_time = 60
-            logging.info(f"Waiting {wait_time}s before next repo to avoid rate limits...")
-            time.sleep(wait_time)
+            parts = repo_url.rstrip('/').split('/')
+            full_repo_name = f"{parts[-2]}_{parts[-1]}"
+            summary_file = DOCS_DIR / full_repo_name / "SUMMARY.md"
+            
+            if not summary_file.exists():
+                wait_time = 60
+                logging.info(f"Waiting {wait_time}s before next repo to avoid rate limits...")
+                time.sleep(wait_time)
 
     if CLONE_DIR.exists():
         shutil.rmtree(CLONE_DIR, onerror=handle_remove_readonly)
