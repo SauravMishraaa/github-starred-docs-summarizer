@@ -39,6 +39,7 @@ jobs:
         run: |
           uv run client.py
       
+      # github-actions[bot]
       - name: Commit and push new summaries
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
