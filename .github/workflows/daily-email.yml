@@ -2,12 +2,23 @@ name: Send Daily Documentation Summary
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    - cron: '0 9 * * *'  # 9 AM UTC daily
   workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Send to which platform?'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - email
+          - telegram
+          - both
 
 jobs:
   send-email:
     runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event.inputs.platform == 'email' || github.event.inputs.platform == 'both'
     
     steps:
       - name: Checkout repository
@@ -66,5 +77,66 @@ jobs:
           path: |
             sent_summaries.json
             summary_queue.json
+          retention-days: 90
+          overwrite: true
+
+  send-telegram:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event.inputs.platform == 'telegram' || github.event.inputs.platform == 'both'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: false
+      
+      - name: Set up Python
+        run: uv python install 3.11
+        
+      - name: Create virtual environment
+        run: uv venv
+      
+      - name: Install dependencies
+        run: |
+          uv pip install openai requests python-dotenv markdown
+      
+      - name: Download sent log and queue artifacts
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          name: telegram-queue-log
+          path: .
+          if_no_artifact_found: ignore
+          workflow_conclusion: success
+          search_artifacts: true
+      
+      - name: Create default queue files if missing
+        run: |
+          if [ ! -f sent_summaries_telegram.json ]; then
+            echo '{}' > sent_summaries_telegram.json
+          fi
+          if [ ! -f summary_queue_telegram.json ]; then
+            echo '{"queue": [], "sent_order": []}' > summary_queue_telegram.json
+          fi
+      
+      - name: Send daily summary to Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          uv run telegram.py
+      
+      - name: Upload sent log and queue artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: telegram-queue-log
+          path: |
+            sent_summaries_telegram.json
+            summary_queue_telegram.json
           retention-days: 90
           overwrite: true
