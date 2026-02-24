@@ -9,18 +9,18 @@
 
 ---
 
-## 🌟 Features
+## Features
 
-- 📥 **Auto-fetch** documentation from your starred GitHub repositories
-- 🤖 **AI-powered summaries** using OpenAI GPT-4o-mini
-- 📧 **Daily email delivery** of one summary per day
-- 🔄 **Cyclic sending** - once all summaries are sent, restarts from beginning
-- 🆕 **Auto-detects new repos** - new starred repos are automatically included
-- ⚙️ **Fully automated** via GitHub Actions - zero manual work after setup
+-  **Auto-fetch** documentation from your starred GitHub repositories
+-  **AI-powered summaries** using OpenAI GPT-4o-mini
+-  **Daily email delivery** of one summary per day
+-  **Cyclic sending** - once all summaries are sent, restarts from beginning
+-  **Auto-detects new repos** - new starred repos are automatically included
+-  **Fully automated** via GitHub Actions - zero manual work after setup
 
 ---
 
-## 🚀 How It Works
+## How It Works
 
 ```
 Every Sunday 2 AM UTC (Can be modified)
@@ -44,7 +44,7 @@ Track sent summaries (cyclic)
 https://github.com/user-attachments/assets/bbda97b8-9f80-4671-98fd-faf8ed4bcdee
 
 ---
-## 📋 Prerequisites
+## Prerequisites
 
 - Python 3.11+
 - [uv](https://github.com/astral-sh/uv) package manager
@@ -54,7 +54,7 @@ https://github.com/user-attachments/assets/bbda97b8-9f80-4671-98fd-faf8ed4bcdee
 
 ---
 
-## 🛠️ Setup Guide
+## Setup Guide
 
 ### Step 1: Fork & Clone the Repository
 
@@ -177,7 +177,7 @@ That's it! 🎉 The workflows will run automatically.
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Change Email Schedule
 
@@ -210,48 +210,9 @@ on:
 ### Manually Trigger Workflows
 
 Go to **Actions** tab → Select workflow → Click **Run workflow**
-
 ---
 
-## 📁 Project Structure
-
-```
-github-docs-summarizer/
-├── .github/
-│   └── workflows/
-│       ├── daily-email.yml         # Sends one summary per day
-│       └── weekly-generate.yml     # Generates summaries weekly
-├── github_docs/                    # Generated summaries (auto-managed)
-│   ├── owner1_repo1/
-│   │   ├── README.md
-│   │   └── SUMMARY.md
-│   └── owner2_repo2/
-│       └── SUMMARY.md
-├── client.py                       # Generates AI summaries
-├── docs.py                         # Clones repos and extracts docs
-├── fetch.py                        # Fetches starred repos from GitHub
-├── mail.py                         # Sends daily email
-├── test_mail.py                    # Tests email configuration
-├── .env.example                    # Example environment variables
-├── .gitignore
-└── README.md
-```
-
----
-
-## 🔧 File Descriptions
-
-| File | Description |
-|------|-------------|
-| `fetch.py` | Fetches all your starred GitHub repository URLs |
-| `docs.py` | Clones repos, finds documentation files, copies them |
-| `client.py` | Reads docs, generates AI summaries using OpenAI |
-| `mail.py` | Sends daily summaries via email in cyclic order |
-| `test_mail.py` | Tests email configuration before running |
-
----
-
-## 📧 Email Tracking
+## Email Tracking
 
 The system tracks sent summaries in `sent_summaries.json`:
 
@@ -282,7 +243,7 @@ The system tracks sent summaries in `sent_summaries.json`:
 
 ---
 
-## ❗ Troubleshooting
+## Troubleshooting
 
 <details>
 <summary>Email not sending</summary>
@@ -322,17 +283,7 @@ The system tracks sent summaries in `sent_summaries.json`:
 
 ---
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
